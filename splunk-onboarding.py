@@ -5,8 +5,6 @@ splunk-onboarding.py
 
 Source: https://pynative.com/python-mysql-tutorial/
 
-version 1
-
 '''
 
 
