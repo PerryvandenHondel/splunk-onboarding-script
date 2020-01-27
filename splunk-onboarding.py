@@ -9,9 +9,10 @@ Source: https://pynative.com/python-mysql-tutorial/
 
 
 
-from pathlib import Path
+from pathlib import Path # For mkdir
 import mysql.connector
 from mysql.connector import Error
+import sys  # For file operations
 
 
 
@@ -27,7 +28,7 @@ def CreateDirectoryNameForDeploymentApp(number):
 
 
 
-def CreateOneDeploymentApp(logFileId, directoryCreate, pathToMonitor, sourceType):
+def CreateOneDeploymentApp(logFileId, directoryCreate, pathToMonitor, sourceType, index):
     '''
     Create a new deployment app in the required directory
 
@@ -35,12 +36,34 @@ def CreateOneDeploymentApp(logFileId, directoryCreate, pathToMonitor, sourceType
     directoryCreate: Starting directory where to create the new inputs.conf
     pathToMonitor: Which log file to monitor in the inputs.conf
     sourceType: Use this source type in the inputs stanza
+    index: Name of the index to write to
     '''
     print('CreateOneDeploymentApp()')
 
     directoryFull = directoryCreate + '/' + CreateDirectoryNameForDeploymentApp(logFileId) +'/local/'
     print(directoryFull)
     Path(directoryFull).mkdir(parents=True, exist_ok=True)
+
+    #[monitor:///var/log]
+    #whitelist = (\.log|log$|messages|secure|auth|mesg$|cron$|acpid$|\.out)
+    #blacklist = (lastlog|anaconda\.syslog)
+    #disabled = false
+    #index = idxe_oslinux
+
+    try:
+        f = open(directoryFull + '/inputs.conf', 'w')
+    except IOError as e:
+        print('Error opening file:', e)
+    else:
+        f.write('[monitor://' + pathToMonitor + ']\n')
+        f.write('disabled = false\n')
+        f.write('sourcetype = ' + sourceType + '\n')
+        f.write('index = ' + index + '\n')
+
+        f.close()
+
+        
+
 
 
 
@@ -57,7 +80,7 @@ def ProcessDeploymentApps(environment):
     print('CreateDeploymentApp(): record found to process')
     for row in records:
         print(row[0], '\t', row[1], '\t', row[2], '\t', row[3], '\t', row[4], '\t', row[5], '\t', row[6], '\t', row[7],  '\t', row[8])
-        CreateOneDeploymentApp(row[3], row[5], row[6], row[7])
+        CreateOneDeploymentApp(row[3], row[5], row[6], row[7], row[8])
 
     
 
