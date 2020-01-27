@@ -66,6 +66,7 @@ def CreateOneDeploymentApp(logFileId, directoryCreate, pathToMonitor, sourceType
         resultCode = os.system('/opt/splunk/bin/splunk restart')
         if resultCode == 0:
             print('Succesfully added new DA: {}'.format(logFileId))
+            print('Update record to succesfully done!')
         else:
             print('Error while adding a new DA {}'.format(logFileId))
     
