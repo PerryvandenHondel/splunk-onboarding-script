@@ -12,6 +12,7 @@ Source: https://pynative.com/python-mysql-tutorial/
 from pathlib import Path # For mkdir
 import mysql.connector
 from mysql.connector import Error
+import os
 import sys  # For file operations
 
 
@@ -62,9 +63,12 @@ def CreateOneDeploymentApp(logFileId, directoryCreate, pathToMonitor, sourceType
 
         f.close()
 
-        
-
-
+        resultCode = os.system('/opt/splunk/bin/splunk restart')
+        if resultCode == 0:
+            print('Succesfully added new DA: {}'.format(logFileId))
+        else:
+            print('Error while adding a new DA {}'.format(logFileId))
+    
 
 
 def ProcessDeploymentApps(environment):
