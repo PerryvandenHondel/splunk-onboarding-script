@@ -17,6 +17,8 @@ Code; A string field type with a code
 
 Table Definitions
 
+
+
 ENV; Environments, every Splunk instance gets a environment code of 3 letters
     env_code
     env_description
@@ -42,8 +44,17 @@ CREATE TABLE `SPLUNK_ONBOARDING`.`environment_logfile_elf` (
   PRIMARY KEY (`elf_code`));
 
 
-JO
+
+IDX index_idx
+    idx_id
+    idx_env_code
+    idx_name
+
+
+
 SCS; Server Classes
+
+
 
 CDA; create_deployment_app_cda
     cda_id
