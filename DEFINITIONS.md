@@ -64,6 +64,12 @@ CDA; create_deployment_app_cda
     cda_is_created
 
 
+CSC CREATE_SERVER_CLASS_CSC
+    csc_id
+    csc_env_code
+    csc_scs_code
+    csc_is_created
+
 
 
 
@@ -86,3 +92,12 @@ VIEW `SPLUNK_ONBOARDING`.`view_create_new_da` AS
         (`SPLUNK_ONBOARDING`.`logfile_lgf`
         JOIN `SPLUNK_ONBOARDING`.`environment_env` ON ((`SPLUNK_ONBOARDING`.`logfile_lgf`.`lgf_env_code` = `SPLUNK_ONBOARDING`.`environment_env`.`env_code`)))
 
+
+
+
+INPUTS.CONF Example
+
+[monitor:///var/log/syslog]
+disabled = false
+sourcetype = syslog
+index = idxe_sandbox
