@@ -29,11 +29,27 @@ def CreateDirectoryNameForDeploymentApp(number):
 
 
 
-def CreateOneDeploymentApp(logFileId, directoryCreate, pathToMonitor, sourceType, index):
+def UpdateCda(recordId):
     '''
-    Create a new deployment app in the required directory
+    Update the table create_deployment_app_cda where cda_id = recordId
 
-    logFileId: Unique log file ID. Every log file has a unqiue ID
+    recordId: Number of the record to update
+
+    Example SQL: UPDATE `SPLUNK_ONBOARDING`.`create_deployment_app_cda` SET `cda_is_created` = '1' WHERE (`cda_id` = '4');
+    '''
+    query = 'UPDATE create_deployment_app_cda SET cda_is_created=1 WHERE cda_id=' + str(recordId) 
+    print(query)
+    cursor.execute(query)
+    connection.commit()
+
+
+
+def CreateOneDeploymentApp(recordId, logFileId, directoryCreate, pathToMonitor, sourceType, index):
+    '''
+    Create one new deployment app in the required directory
+
+    recordId: Unique record ID. Every record has a unqiue ID
+    logFileId: Unique log file ID. Every log file has a unique ID
     directoryCreate: Starting directory where to create the new inputs.conf
     pathToMonitor: Which log file to monitor in the inputs.conf
     sourceType: Use this source type in the inputs stanza
@@ -63,13 +79,16 @@ def CreateOneDeploymentApp(logFileId, directoryCreate, pathToMonitor, sourceType
 
         f.close()
 
-        resultCode = os.system('/opt/splunk/bin/splunk restart')
+        resultCode = os.system('/opt/splunk/bin/splunk status') # splunk restart to activate for real
         if resultCode == 0:
             print('Succesfully added new DA: {}'.format(logFileId))
             print('Update record to succesfully done!')
+            UpdateCda(recordId)
         else:
             print('Error while adding a new DA {}'.format(logFileId))
     
+    print('===')    
+
 
 
 def ProcessDeploymentApps(environment):
@@ -78,16 +97,14 @@ def ProcessDeploymentApps(environment):
 
     environment: Code of the Splunk environment thats needs to be created.
     '''
-    query = "SELECT * FROM view_create_deployment_app WHERE cda_env_code='" + environment + "' AND cda_is_created=0"
+    query = "SELECT * FROM view_create_deployment_app WHERE cda_env_code='" + environment + "'"
     cursor = connection.cursor()
     cursor.execute(query)
     records = cursor.fetchall()
     print('CreateDeploymentApp(): record found to process')
     for row in records:
         print(row[0], '\t', row[1], '\t', row[2], '\t', row[3], '\t', row[4], '\t', row[5], '\t', row[6], '\t', row[7],  '\t', row[8])
-        CreateOneDeploymentApp(row[3], row[5], row[6], row[7], row[8])
-
-    
+        CreateOneDeploymentApp(row[0], row[3], row[5], row[6], row[7], row[8]) # 0:recordId, 3:logFileId, 5:directoryCreate, 6:pathToMonitor, 7:sourceType, 8:index
 
 
 
@@ -102,6 +119,7 @@ def main():
         if connection.is_connected():
             db_Info = connection.get_server_info()
             print("Connected to MySQL Server version ", db_Info)
+            global cursor
             cursor = connection.cursor()
             cursor.execute("select database();")
             record = cursor.fetchone()
