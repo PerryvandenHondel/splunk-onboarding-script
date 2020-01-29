@@ -4,6 +4,20 @@ Definitions
 
 
 
+TA Technical Add-ons installed on: 
+    Index servers
+    Deployment Clients
+
+    indexes.conf
+    props.conf
+    serverclass.conf
+
+SA Search Apps installed on:
+    Search Head servers
+    
+
+
+
 
 
 Database Field Definitons
@@ -65,11 +79,25 @@ CDA; create_deployment_app_cda
 
 
 CSC CREATE_SERVER_CLASS_CSC
-    csc_id
-    csc_env_code
-    csc_scs_code
-    csc_is_created
+    csc_id              INT
+    csc_env_code        CHAR(3)
+    csc_scs_code        CHAR(12)
+    csc_is_created      INT         1=TRUE; 0=FALSE
+    csc_rcd             DATETIME    CURRENT_TIMESTAMP
 
+
+CNI CONGIGURATION_ITEM_CNI
+    cni_code            CHAR(12)
+    cni_description     CHAR(72)
+    cni_cmdb_ci         CHAR(32)            Code in the Companies CMDB system
+
+
+
+CTA CREATE_TECHNICAL_ADDON_CTA
+    cta_id              INT
+    cta_env_code        CHAR(3)
+    cta_cni_code        CHAR(12)
+    cta_is_created      INT         1=TRUE; 0=FALSE
 
 
 
@@ -91,6 +119,22 @@ VIEW `SPLUNK_ONBOARDING`.`view_create_new_da` AS
     FROM
         (`SPLUNK_ONBOARDING`.`logfile_lgf`
         JOIN `SPLUNK_ONBOARDING`.`environment_env` ON ((`SPLUNK_ONBOARDING`.`logfile_lgf`.`lgf_env_code` = `SPLUNK_ONBOARDING`.`environment_env`.`env_code`)))
+    WHERR cda_is_created=0
+
+
+CREATE VIEW `view_create_server_class` AS
+	SELECT
+		csc_id,
+        csc_env_code,
+        csc_scs_code,
+        csc_is_created
+	FROM
+		create_server_class_csc
+	JOIN
+		environment_env ON csc_env_code=env_code
+	WHERE
+		csc_is_create=0
+
 
 
 
