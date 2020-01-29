@@ -43,6 +43,69 @@ def UpdateCda(recordId):
     connection.commit()
 
 
+def CreateDirectoryNameForTechnicalAddon(configName):
+    '''
+    Create a name for a directory that will be the TA name
+
+    configName: Name of the config that will be part of the TA name.
+    '''
+    return 'ta-' + configName.lower()
+
+
+
+def CreateDirectoryTree(directoryTree):
+    '''
+    Create the directoryTree 
+    '''
+    try:
+        Path(directoryTree).mkdir(parents=True, exist_ok=True)
+    except Error as e:
+        print('CreateDirectoryTree() ERROR ' + e)
+    else:
+        print('CreateDirectoryTree() Succesful created directory tree ' + directoryTree)
+
+
+
+def CreateOneTechnicalAddon(environmentCode, directoryTa, configItemCode):
+    '''
+    Create one technical addon on the 
+
+    environmentCode: Code of the environment of 3 letters.
+    directoryTa: Where will the TA be written
+    configItemCode:
+    '''
+    print('CreateOneTechnicalAddon()')
+    print(environmentCode)
+    print(directoryTa)
+    print(configItemCode)
+    print(CreateDirectoryNameForTechnicalAddon(configItemCode))
+
+    # Build the complete directory name
+    CreateDirectoryTree(directoryTa + '/' + CreateDirectoryNameForTechnicalAddon(configItemCode) +'/local/')
+    
+
+
+def ProcessTechnicalAddon(environment):
+    '''
+    Select the records from the view that need to be created
+
+    environment: Code of 3 letters to select the environment
+    '''
+    query = "SELECT * FROM view_create_technical_addon WHERE cta_env_code='" + environment + "' AND cta_is_created=0"
+    cursor = connection.cursor()
+    cursor.execute(query)
+    records = cursor.fetchall()
+    
+    print('ProcessTechnicalAddon(): Select records to create the technical add-ons')
+    for row in records:
+        # 0: cta_id
+        # 1: cta_env_code
+        # 2: env_directory_ma
+        # 3: cta_cni_code
+        # 4: cta_is_created
+        CreateOneTechnicalAddon(row[1], row[2], row[3])
+        print('=====')
+
 
 def CreateOneDeploymentApp(recordId, logFileId, directoryCreate, pathToMonitor, sourceType, index):
     '''
@@ -125,6 +188,12 @@ def main():
             record = cursor.fetchone()
             print("You're connected to database: ", record)
 
+            ProcessTechnicalAddon('TST')
+
+            if (connection.is_connected()):
+                cursor.close()
+                connection.close()
+                print("MySQL connection is closed")
     except Error as e:
         print("Error while connecting to MySQL", e)
     
@@ -138,17 +207,12 @@ def main():
     ##for row in records:
     ##    print(row[0], '\t', row[1], '\t',  row[2], '\t', row[3])
 
+    #ProcessDeploymentApps('VOY')
+   
+    #print(CreateDirectoryNameForDeploymentApp(43))
 
 
-    ProcessDeploymentApps('VOY')
-
-    print(CreateDirectoryNameForDeploymentApp(43))
-
-
-    if (connection.is_connected()):
-        cursor.close()
-        connection.close()
-        print("MySQL connection is closed")
+   
 
 
 
