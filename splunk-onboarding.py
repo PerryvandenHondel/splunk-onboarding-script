@@ -171,6 +171,35 @@ def ProcessDeploymentApps(environment):
 
 
 
+def CreateNewSearchAppDirectoryName(searchAppName):
+    '''
+    Create a new directory name for the Search App
+
+    searchAppName: name of the search app abbreviated (RRS => sa-rss)
+    '''
+    return 'sa-' + searchAppName.lower()
+
+
+
+def ProcessCreateSearchApp():
+    '''
+    Create all new Search Apps.
+    '''
+    print('ProcessCreateSearchApp()')
+
+    query = 'SELECT * FROM VIEW_CREATE_SEARCH_APP'
+    cursor = connection.cursor()
+    cursor.execute(query)
+    records = cursor.fetchall()
+    for row in records:
+        print('{:10n} {:16s} {:64s} {:20s}'.format(row[0], row[1], row[2], row[3]))
+
+        print(CreateNewSearchAppDirectoryName(row[2]))
+
+        CreateOneSearchApp()
+
+
+
 def main():
     try:
         global connection
@@ -188,7 +217,8 @@ def main():
             record = cursor.fetchone()
             print("You're connected to database: ", record)
 
-            ProcessTechnicalAddon('TST')
+            #ProcessTechnicalAddon('TST')
+            ProcessCreateSearchApp()
 
             if (connection.is_connected()):
                 cursor.close()
