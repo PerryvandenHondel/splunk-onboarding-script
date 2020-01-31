@@ -181,6 +181,17 @@ def CreateNewSearchAppDirectoryName(searchAppName):
 
 
 
+def CreateOneSearchApp(environmentCode, configurationCode, directorySearchApp):
+    '''
+    Create one search app
+    '''
+    print('CreateOneSearchApp()')
+    print('environmentCode: ' + environmentCode)
+    print('configurationCode: ' + configurationCode)
+    print('directorySearchApp: ' + directorySearchApp)
+
+
+
 def ProcessCreateSearchApp():
     '''
     Create all new Search Apps.
@@ -193,10 +204,8 @@ def ProcessCreateSearchApp():
     records = cursor.fetchall()
     for row in records:
         print('{:10n} {:16s} {:64s} {:20s}'.format(row[0], row[1], row[2], row[3]))
-
-        print(CreateNewSearchAppDirectoryName(row[2]))
-
-        CreateOneSearchApp()
+        #print(CreateNewSearchAppDirectoryName(row[2]))
+        CreateOneSearchApp(row[1], row[2], row[3])
 
 
 
